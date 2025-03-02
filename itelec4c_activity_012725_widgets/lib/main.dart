@@ -1,69 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:itelec4c_activity_test/pages/registration_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+final _firstName = TextEditingController();
+final _lastName = TextEditingController();
+final _address = TextEditingController();
+final _workAddress = TextEditingController();
+final _emailAddress = TextEditingController();
+final _contactNumber = TextEditingController();
+
 // MyApp
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final txtFieldSectionKey = GlobalKey<_TxtFieldSectionState>();
+
     return MaterialApp(
       title: 'Registration Module',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Registration Module'),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              ImgSection(),
-              TxtFieldSection(),
-              BtnFieldSection(),
-            ],
-          )
         ),
         drawer: Drawer(
           child: Column(
             children: [
               MyDrawerHeader(),
-              Expanded( // Wrap MyDrawerListView in Expanded
-                child: MyDrawerListView(),
+              Expanded(child: MyDrawerListView()),
+            ],
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              ImgSection(),
+              TxtFieldSection(key: txtFieldSectionKey),
+              BtnFieldSection(
+                onSubmit: () =>
+                    txtFieldSectionKey.currentState?.validateFields(),
               ),
             ],
           ),
         ),
       ),
-
     );
   }
 }
 
 // MyDrawerHeader
-class MyDrawerHeader extends StatefulWidget{
+class MyDrawerHeader extends StatefulWidget {
+  const MyDrawerHeader({super.key});
+
   @override
   _MyDrawerHeader createState() => _MyDrawerHeader();
 }
@@ -111,7 +107,9 @@ class _MyDrawerHeader extends State<MyDrawerHeader> {
 }
 
 // MyDrawerListView
-class MyDrawerListView extends StatefulWidget{
+class MyDrawerListView extends StatefulWidget {
+  const MyDrawerListView({super.key});
+
   @override
   _MyDrawerListView createState() => _MyDrawerListView();
 }
@@ -119,15 +117,20 @@ class MyDrawerListView extends StatefulWidget{
 class _MyDrawerListView extends State<MyDrawerListView> {
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: EdgeInsets.zero,
+    return Padding(
+      padding: EdgeInsets.zero,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           ListTile(
             title: Text("Main Page"),
             leading: Icon(Icons.home),
-            // onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => registration_page()),
-            onTap: null,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RegistrationPage()),
+              );
+            },
           ),
           ListTile(
             title: Text("Main Page 1"),
@@ -152,25 +155,45 @@ class ImgSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(30),
-      child: Container(
-        height: 200.0,
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg_image.jpg'),
-            fit: BoxFit.cover
+        padding: EdgeInsets.all(30),
+        child: Container(
+          height: 200.0,
+          width: double.maxFinite,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/bg_image.jpg'), fit: BoxFit.cover),
+            shape: BoxShape.rectangle,
           ),
-          shape: BoxShape.rectangle,
-        ),
-      )
-    );
+        ));
   }
 }
 
 // TxtFieldSection
-class TxtFieldSection extends StatelessWidget {
+class TxtFieldSection extends StatefulWidget {
   const TxtFieldSection({super.key});
+
+  @override
+  State<TxtFieldSection> createState() => _TxtFieldSectionState();
+}
+
+class _TxtFieldSectionState extends State<TxtFieldSection> {
+  bool _validateFirstName = false;
+  bool _validateLastName = false;
+  bool _validateAddress = false;
+  bool _validateWorkAddress = false;
+  bool _validateEmailAddress = false;
+  bool _validateContactNumber = false;
+
+  void validateFields() {
+    setState(() {
+      _validateFirstName = _firstName.text.isEmpty;
+      _validateLastName = _lastName.text.isEmpty;
+      _validateAddress = _address.text.isEmpty;
+      _validateWorkAddress = _workAddress.text.isEmpty;
+      _validateEmailAddress = _emailAddress.text.isEmpty;
+      _validateContactNumber = _contactNumber.text.isEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,76 +207,71 @@ class TxtFieldSection extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  controller: _firstName,
+                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'First Name',
-                    hintText: 'First Name',
-                    hintMaxLines: 2,
-                    hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)
+                    errorText: _validateFirstName ? 'Field is required' : null,
                   ),
                 ),
               ),
+              SizedBox(width: 10), // Add spacing
               Expanded(
                 child: TextField(
+                  controller: _lastName,
+                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Last Name',
-                      hintText: 'Last Name',
-                      hintMaxLines: 2,
-                      hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrangeAccent)
+                    border: OutlineInputBorder(),
+                    labelText: 'Last Name',
+                    errorText: _validateLastName ? 'Field is required' : null,
                   ),
                 ),
-              )
+              ),
             ],
           ),
-          Padding(
-            padding: EdgeInsets.all(30),
-            child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Address',
-                hintText: 'Address',
-                hintMaxLines: 2,
-                hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber)
-              ),
-            )
+          SizedBox(height: 10), // Add spacing
+          TextField(
+            controller: _address,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Address',
+              errorText: _validateAddress ? 'Field is required' : null,
+            ),
           ),
-          Padding(
-              padding: EdgeInsets.all(30),
-              child: TextField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Work Address',
-                    hintText: 'Work Address',
-                    hintMaxLines: 2,
-                    hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)
-                ),
-              )
+          SizedBox(height: 10), // Add spacing
+          TextField(
+            controller: _workAddress,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Work Address',
+              errorText: _validateWorkAddress ? 'Field is required' : null,
+            ),
           ),
-          Padding(
-              padding: EdgeInsets.all(30),
-              child: TextField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email Address',
-                    hintText: 'Email Address',
-                    hintMaxLines: 2,
-                    hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
-                ),
-              )
+          SizedBox(height: 10), // Add spacing
+          TextField(
+            controller: _emailAddress,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Email Address',
+              errorText: _validateEmailAddress ? 'Field is required' : null,
+            ),
           ),
-          Padding(
-              padding: EdgeInsets.all(30),
-              child: TextField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Contact Number',
-                    hintText: 'Contact Number',
-                    hintMaxLines: 2,
-                    hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)
-                ),
-              )
-          )
+          SizedBox(height: 10), // Add spacing
+          TextField(
+            controller: _contactNumber,
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(11)
+            ],
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Contact Number',
+              errorText: _validateContactNumber ? 'Field is required' : null,
+            ),
+          ),
         ],
       ),
     );
@@ -261,22 +279,37 @@ class TxtFieldSection extends StatelessWidget {
 }
 
 // BtnFieldSection
-class BtnFieldSection extends StatelessWidget{
-  const BtnFieldSection({super.key});
-  
+class BtnFieldSection extends StatefulWidget {
+  final VoidCallback onSubmit;
+
+  const BtnFieldSection({super.key, required this.onSubmit});
+
+  @override
+  State<BtnFieldSection> createState() => _BtnFieldSectionState();
+}
+
+class _BtnFieldSectionState extends State<BtnFieldSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(30),
       child: Row(
-        spacing: 10,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Expanded(child: ElevatedButton(onPressed: null, child: Text('Disabled'))),
-          Expanded(child: ElevatedButton(onPressed: () {}, child: Text('Enabled'))),
-          Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: Icon(Icons.add, color: Colors.red), label: Text('Enable with Icon'))),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: null,
+              child: Text('Disabled'),
+            ),
+          ),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: widget.onSubmit, // Call validateFields()
+              child: Text('Submit'),
+            ),
+          ),
         ],
-      )
+      ),
     );
   }
 }
