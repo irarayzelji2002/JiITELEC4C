@@ -1,26 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:itelec4c_activity_test/main.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+class CounterPage extends StatelessWidget {
+  const CounterPage({super.key});
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: "Counter Page",
+      home: Scaffold(
+          appBar: AppBar(
+            title: Text("Counter Page Module"),
+          ),
+          drawer: Drawer(
+            child: Column(
+              children: [
+                MyDrawerHeader(),
+                Expanded(child: MyDrawerListView()),
+              ],
+            ),
+          ),
+          body: MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+            ),
+            home: const MyHomePage(title: 'Flutter Demo Home Page'),
+          )),
     );
   }
 }
 
+// MyHomePage (template code)
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
